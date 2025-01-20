@@ -1,1 +1,1 @@
-
+print("I love life")
