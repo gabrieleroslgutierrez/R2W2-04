@@ -16,3 +16,5 @@ print("Query Point:", query_point)
 print("Nearest Neighbors:")
 for i, idx in enumerate(indices[0]):
     print(f"Neighbor {i + 1}: {data[idx]}, Distance: {distances[0][i]}")
+
+#mamamo
