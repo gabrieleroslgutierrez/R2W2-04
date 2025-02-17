@@ -32,7 +32,7 @@ def standardize(data_list,min,max):
     print("test")
 
 #read csv file
-df = csv.read_csv_file("../[Original Values Only] Science Garden.csv")
+df = csv.read_csv_file("..\\[Original Values Only] Science Garden.csv")
 
 #define empty df
 std_df = pd.DataFrame()
@@ -51,4 +51,4 @@ for i in range(len(df.columns)):
     std_df = pd.concat([std_df, std_col], axis=1, join="outer")
 
 print(std_df)
-std_df.to_csv("../[Standardized] Science Garden.csv")
+std_df.to_csv("..\\[Standardized] Science Garden.csv")
