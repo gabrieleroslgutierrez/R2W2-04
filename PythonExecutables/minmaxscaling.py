@@ -24,7 +24,7 @@ def search_max(data_list):
 def standardize(data_list, min, max):
     diff = abs(max - min)
     std_values = [(abs(val - min) / diff) for val in data_list]
-    return pd.DataFrame(std_values, columns=[data_list.name]).reset_index(drop=True)
+    return pd.DataFrame(std_values, columns=[data_list.name])
 
 #read csv file
 df = csv.read_csv_file("..\\[Original Values Only] Science Garden.csv")
