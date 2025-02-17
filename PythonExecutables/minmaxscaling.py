@@ -20,8 +20,15 @@ def search_max(data_list):
     print(max)
     return max
 
-#func to standardize given min max values
+#func to standardize given min max values (minmax scaling)
 def standardize(data_list,min,max):
+    diff = abs(max-min)
+    std_col = pd.DataFrame(columns=[data_list.name])
+    for i in range(len(data_list)):
+        val = data_list.iloc[i]
+        std_val = pd.DataFrame([(abs(val-min)/diff)],columns=[data_list.name])
+        std_col = pd.concat([std_col,std_val], axis=0, join="outer")
+    return std_col
     print("test")
 
 #read csv file
@@ -31,6 +38,12 @@ df = csv.read_csv_file("../[Original Values Only] Science Garden.csv")
 std_df = pd.DataFrame()
 print(std_df)
 
+'''
+go through each column to standardize them
+-searches each column min and max values
+-standardize them using minmax scaling
+-concatenate them to the empty DataFrame (std_df)
+'''
 for i in range(len(df.columns)):
     min = search_min(df.iloc[:,i])
     max = search_max(df.iloc[:,i])
@@ -38,3 +51,4 @@ for i in range(len(df.columns)):
     std_df = pd.concat([std_df, std_col], axis=1, join="outer")
 
 print(std_df)
+std_df.to_csv("../[Standardized] Science Garden.csv")
