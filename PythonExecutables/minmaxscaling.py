@@ -1,6 +1,7 @@
 #standardizing values (testing) (work in progress)
 import csvreadwritetemplate as csv
 import pandas as pd
+import sys
 
 #func to search min value
 def search_min(data_list):
@@ -27,7 +28,11 @@ def standardize(data_list, min, max):
     return pd.DataFrame(std_values, columns=[data_list.name])
 
 #read csv file
-df = csv.read_csv_file("..\\[Original Values Only] Science Garden.csv")
+
+input_file = input("Input file location: ")
+df = csv.read_csv_file(input_file)
+
+output_file = input("Save CSV File to (include filename in path): ")
 
 #define empty df
 std_df = pd.DataFrame()
@@ -39,11 +44,21 @@ go through each column to standardize them
 -standardize them using minmax scaling
 -concatenate them to the empty DataFrame (std_df)
 '''
-for i in range(len(df.columns)):
-    min = search_min(df.iloc[:,i])
-    max = search_max(df.iloc[:,i])
-    std_col = standardize(df.iloc[:,i],min,max)
-    std_df = pd.concat([std_df, std_col], axis=1, join="outer")
+try:
+    for i in range(len(df.columns)):
+        min = search_min(df.iloc[:,i])
+        max = search_max(df.iloc[:,i])
+        std_col = standardize(df.iloc[:,i],min,max)
+        std_df = pd.concat([std_df, std_col], axis=1, join="outer")
+except Exception as e:
+    print(f"Something went wrong: {e}")
+    sys.exit()
 
-print(std_df)
-std_df.to_csv("..\\[Standardized] Science Garden.csv")
+
+try:
+    print(std_df)
+    std_df.to_csv(output_file)
+except Exception as e:
+    print(f"Failed to save at the specified location: {e}")
+    print("Saving to default directory")
+    std_df.to_csv("output.csv")
