@@ -8,7 +8,9 @@ def search_min(data_list):
     min = 0
     for i in range(len(data_list)):
         val = data_list.iloc[i]
+        if i == 0: min = val
         if val < min: min = val
+    print(min)
     return min
 
 #func to search max value
@@ -16,6 +18,7 @@ def search_max(data_list):
     max = 0
     for i in range(len(data_list)):
         val = data_list.iloc[i]
+        if i == 0: min = val
         if val > max: max = val
     return max
 
