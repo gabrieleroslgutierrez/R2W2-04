@@ -32,7 +32,7 @@ def standardize(data_list, min, max):
 input_file = input("Input file location: ")
 df = csv.read_csv_file(input_file)
 
-output_file = input("Save CSV File to (include filename in path): ")
+output_file = input("Save CSV File to (include filename in path <path>\<filename>.csv): ")
 
 #define empty df
 std_df = pd.DataFrame()
