@@ -10,7 +10,6 @@ def search_min(data_list):
         val = data_list.iloc[i]
         if i == 0: min = val
         if val < min: min = val
-    print(min)
     return min
 
 #func to search max value
