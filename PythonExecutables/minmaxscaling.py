@@ -1,4 +1,4 @@
-#standardizing values (testing) (work in progress)
+#standardizing values
 import csvreadwritetemplate as csv
 import pandas as pd
 import sys
@@ -10,7 +10,6 @@ def search_min(data_list):
         val = data_list.iloc[i]
         if i == 0: min = val
         if val < min: min = val
-    print(min)
     return min
 
 #func to search max value
@@ -54,6 +53,7 @@ except Exception as e:
 
 
 try:
+    print(f"\n{std_df}")
     output_file = input("Save CSV File to (include filename in path <path>\\<filename>.csv): ")
     std_df.to_csv(output_file)
 except Exception as e:
