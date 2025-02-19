@@ -1,4 +1,4 @@
-#standardizing values (testing) (work in progress)
+#standardizing values
 import csvreadwritetemplate as csv
 import pandas as pd
 import sys
