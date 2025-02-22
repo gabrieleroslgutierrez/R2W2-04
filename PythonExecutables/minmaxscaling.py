@@ -55,7 +55,7 @@ except Exception as e:
 try:
     print(f"\n{std_df}")
     output_file = input("Save CSV File to (include filename in path <path>\\<filename>.csv): ")
-    std_df.to_csv(output_file)
+    std_df.to_csv(output_file, index=False)
 except Exception as e:
     print(f"Failed to save at the specified location: {e}")
     print("Saving to default directory")
