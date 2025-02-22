@@ -14,17 +14,21 @@ def training_split(data,test_per):
     print(cut_index)
     train = data[:cut_index]
     test = data[cut_index:]
-    return train,test
+    return train, test
 
-#splits df columns to two
-def split_col(data,first_col_size):
-    print("hatdog")
+#splits df columns to two (depending on how many days)
+def split_col(data,d_cut,col_len):
+    cut_index = (len(data.columns)) - (d_cut*col_len)
+    new_train = data.iloc[:,:cut_index]
+    result = data.iloc[:,cut_index:]
+    return new_train, result
 
-def transform_train(train_data,days):
+#transform the dataset depending on the # of days
+def transform_data(train_data,days,d_cut):
     transform_train_data = pd.DataFrame()
     for i in range(len(train_data) - days):
         transform_row = pd.DataFrame()
-        for j in range(days + 1):
+        for j in range(days + d_cut):
             row = train_data.iloc[i + j, :]
             row.index = [f"{col}{j}" for col in train_data.columns]
             row = row.to_frame().T.reset_index(drop=True)
@@ -33,7 +37,8 @@ def transform_train(train_data,days):
             else:
                 transform_row = pd.concat([transform_row, row], axis=1)
         transform_train_data = pd.concat([transform_train_data, transform_row], axis=0, ignore_index=True)
-    return transform_train_data
+    t,r = split_col(transform_train_data,d_cut,len(train_data.columns))
+    return t,r
 
 input_file = input("Input file location: ")
 df = csv.read_csv_file(input_file)
@@ -42,7 +47,14 @@ train_data, test_data = training_split(df,TEST)
 print(train_data)
 print(test_data)
 
-print(transform_train(train_data,5))
+x_train, y_train = transform_data(train_data,5,1)
+print(x_train)
+print(y_train)
 
+x_test, y_test = transform_data(test_data,5,1)
+print(x_test)
+print(y_test)
+
+#scikit stuff  below here [W.I.P.]
 
 
