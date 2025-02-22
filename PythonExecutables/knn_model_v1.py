@@ -21,9 +21,19 @@ def split_col(data,first_col_size):
     print("hatdog")
 
 def transform_train(train_data,days):
-    for i in range(len(train_data)-5):
-        print(train_data.ilocp[0,1])
-    return 
+    transform_train_data = pd.DataFrame()
+    for i in range(len(train_data) - days):
+        transform_row = pd.DataFrame()
+        for j in range(days + 1):
+            row = train_data.iloc[i + j, :]
+            row.index = [f"{col}{j}" for col in train_data.columns]
+            row = row.to_frame().T.reset_index(drop=True)
+            if transform_row.empty:
+                transform_row = row
+            else:
+                transform_row = pd.concat([transform_row, row], axis=1)
+        transform_train_data = pd.concat([transform_train_data, transform_row], axis=0, ignore_index=True)
+    return transform_train_data
 
 input_file = input("Input file location: ")
 df = csv.read_csv_file(input_file)
@@ -31,5 +41,8 @@ df = csv.read_csv_file(input_file)
 train_data, test_data = training_split(df,TEST)
 print(train_data)
 print(test_data)
+
+print(transform_train(train_data,5))
+
 
 
