@@ -84,4 +84,4 @@ print("\n")
 
 for i in range(len(MAE_list)):
     MAPE = MAE_list[i]/(y_pred.iloc[:,i].sum()/len(y_pred))
-    print(MAPE)
+    print(1-MAPE)
