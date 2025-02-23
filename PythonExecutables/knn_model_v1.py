@@ -1,7 +1,7 @@
 #work in progress, one day pred only
 import pandas as pd
 import numpy as np
-from sklearn.neighbors import KNeighborsRegressor as knn_reg
+from sklearn.neighbors import KNeighborsRegressor
 import csvreadwritetemplate as csv
 
 #change if u want
@@ -57,4 +57,10 @@ print(y_test)
 
 #scikit stuff  below here [W.I.P.]
 
+knn_regressor = KNeighborsRegressor(n_neighbors=5)
+knn_regressor.fit(x_train, y_train)
+y_pred_arr = knn_regressor.predict(x_test)
+col_names = [f"{col}" for col in y_test.columns]
+y_pred = pd.DataFrame(y_pred_arr, columns=col_names)
 
+print(y_pred)
