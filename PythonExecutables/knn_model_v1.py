@@ -6,9 +6,9 @@ import csvreadwritetemplate as csv
 
 #change if u want
 TEST = 0.2
-DAYS = 3
+DAYS = 7
 PRED_DAYS = 1
-K = 5
+K = 50
 
 #train-test split with respect to the consecutive days
 #didin't use scikit's built-it because we need to preserve consec days
