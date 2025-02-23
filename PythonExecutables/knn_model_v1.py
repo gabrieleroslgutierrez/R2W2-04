@@ -6,6 +6,9 @@ import csvreadwritetemplate as csv
 
 #change if u want
 TEST = 0.2
+DAYS = 3
+PRED_DAYS = 1
+K = 5
 
 #train-test split with respect to the consecutive days
 #didin't use scikit's built-it because we need to preserve consec days
@@ -47,20 +50,38 @@ train_data, test_data = training_split(df,TEST)
 print(train_data)
 print(test_data)
 
-x_train, y_train = transform_data(train_data,5,1)
+x_train, y_train = transform_data(train_data,DAYS,PRED_DAYS)
 print(x_train)
 print(y_train)
 
-x_test, y_test = transform_data(test_data,5,1)
+x_test, y_test = transform_data(test_data,DAYS,PRED_DAYS)
 print(x_test)
 print(y_test)
 
 #scikit stuff  below here [W.I.P.]
 
-knn_regressor = KNeighborsRegressor(n_neighbors=5)
+knn_regressor = KNeighborsRegressor(n_neighbors=K)
 knn_regressor.fit(x_train, y_train)
 y_pred_arr = knn_regressor.predict(x_test)
 col_names = [f"{col}" for col in y_test.columns]
 y_pred = pd.DataFrame(y_pred_arr, columns=col_names)
 
 print(y_pred)
+print(y_test)
+
+y_abs_diff = (y_test.subtract(y_pred)).abs()
+
+print(y_abs_diff)
+
+MAE_list = []
+for i in range(len(y_abs_diff.columns)):
+    MAE_col = ((y_abs_diff.iloc[:,i]).sum())/(len(y_abs_diff))
+    MAE_col = MAE_col.tolist()
+    MAE_list.append(MAE_col)
+
+print(MAE_list)
+print("\n")
+
+for i in range(len(MAE_list)):
+    MAPE = MAE_list[i]/(y_pred.iloc[:,i].sum()/len(y_pred))
+    print(MAPE)
