@@ -5,7 +5,6 @@ def replace_negative_one(csv_file, output_file):
         df = pd.read_csv(csv_file)
         
      
-        df = df.applymap(lambda x: 0 if x == -1 else x)
         
 
         df.to_csv(output_file, index=False)
