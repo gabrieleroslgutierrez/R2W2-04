@@ -8,10 +8,10 @@ import csvreadwritetemplate as csv
 TEST = 0.2
 DAYS = 7
 PRED_DAYS = 1
-K = 50
-
+K = 20
 #train-test split with respect to the consecutive days
 #didin't use scikit's built-it because we need to preserve consec days
+
 def training_split(data,test_per):
     cut_index = len(data) - int(len(data)*test_per) - 1
     print(cut_index)
@@ -41,35 +41,47 @@ def transform_data(train_data,days,d_cut):
                 transform_row = pd.concat([transform_row, row], axis=1)
         transform_train_data = pd.concat([transform_train_data, transform_row], axis=0, ignore_index=True)
     t,r = split_col(transform_train_data,d_cut,len(train_data.columns))
+    print("transformed data")
+    print(transform_train_data)
+    print("-----------------------------------------------")
     return t,r
 
 input_file = input("Input file location: ")
 df = csv.read_csv_file(input_file)
 
 train_data, test_data = training_split(df,TEST)
+print("train test data")
 print(train_data)
 print(test_data)
+print("-----------------------------------------------")
 
 x_train, y_train = transform_data(train_data,DAYS,PRED_DAYS)
+print("x-train, y-train")
 print(x_train)
 print(y_train)
+print("-----------------------------------------------")
 
 x_test, y_test = transform_data(test_data,DAYS,PRED_DAYS)
+print("x-test, y-test")
 print(x_test)
 print(y_test)
+print("-----------------------------------------------")
 
 #scikit stuff  below here [W.I.P.]
 
-knn_regressor = KNeighborsRegressor(n_neighbors=K)
+knn_regressor = KNeighborsRegressor(n_neighbors=K, weights='distance')
 knn_regressor.fit(x_train, y_train)
 y_pred_arr = knn_regressor.predict(x_test)
 col_names = [f"{col}" for col in y_test.columns]
 y_pred = pd.DataFrame(y_pred_arr, columns=col_names)
 
+print("y-pred, y-test")
 print(y_pred)
 print(y_test)
+print("-----------------------------------------------")
 
 y_abs_diff = (y_test.subtract(y_pred)).abs()
+
 
 print(y_abs_diff)
 
@@ -84,4 +96,4 @@ print("\n")
 
 for i in range(len(MAE_list)):
     MAPE = MAE_list[i]/(y_pred.iloc[:,i].sum()/len(y_pred))
-    print(1-MAPE)
+    print(MAPE)
