@@ -3,9 +3,6 @@ import pandas as pd
 def replace_negative_one(csv_file, output_file):
    
         df = pd.read_csv(csv_file)
-        
-     
-        
 
         df.to_csv(output_file, index=False)
         
