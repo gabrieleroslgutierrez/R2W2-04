@@ -11,21 +11,14 @@ def check_majority(dates,date_x,col):
     majority = False
     major = 0
     count = 0
-    print("///")
     for i in range(len(dates)):
         if date_x["MONTH"] == dates.iloc[i,1] and date_x["DAY"] == dates.iloc[i,2]:
             if date_x["YEAR"] != dates.iloc[i,0] and col[i] > 0:
-                print(col[i])
                 count = count + 1
                 major = major + 1
             else: 
                 if date_x["YEAR"] != dates.iloc[i,0] and col[i] <= 0:  
-                    print(col[i])
                     count = count + 1
-    print("///")
-    print(major)
-    print(count)
-    print("///")
     if major/count > 0.5:
         majority = True
     else:
@@ -39,7 +32,6 @@ def date_average(dates,date_x,col):
         if date_x["MONTH"] == dates.iloc[i,1] and date_x["DAY"] == dates.iloc[i,2]:
             if date_x["YEAR"] != dates.iloc[i,0] and col[i] >= 0:
                 val = val + col[i]
-                print(col[i])   
                 count = count + 1
     if count == 0: count = 1
     val = val/count
@@ -54,14 +46,10 @@ def rainfall_date_average(dates,date_x,col):
         for i in range(len(dates)):
             if date_x["MONTH"] == dates.iloc[i,1] and date_x["DAY"] == dates.iloc[i,2]:
                 if date_x["YEAR"] != dates.iloc[i,0] and col[i] > 0:
-                    val = val + col[i]
-                    print(col[i])   
+                    val = val + col[i]  
                     count = count + 1
         if count == 0: count = 1
         val = val/count
-    print("---")
-    print(val)
-    print("---")
     return val
 
 # Placeholder function for linear interpolation
@@ -89,21 +77,18 @@ ave = pd.DataFrame()
 # Iterate over each column in the data
 for col in data:
     dat = data[col]
-    print(dat.name)
     for i in range(len(dat)):
         val = dat.iloc[i]
-        print(val)
         if val < 0:
             if dat.name == "RAINFALL":
-                print("yes2")
                 dv = rainfall_date_average(dates,dates.iloc[i],dat)
                 dat[i] = dv
             else:
-                print("yes")
                 dv = date_average(dates,dates.iloc[i],dat)
                 dat[i] = dv
     ave = pd.concat([ave, dat], axis=1, ignore_index=True)
 
-print(ave)
+
+ave = ave.set_axis(data.columns, axis=1)
 ave.to_csv("testing.csv", index=False)
     
