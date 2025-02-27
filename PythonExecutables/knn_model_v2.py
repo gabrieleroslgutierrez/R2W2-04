@@ -51,5 +51,4 @@ df = csv.read_csv_file(input_file)
 class_row = classify_rainfall(df["RAINFALL"])
 df = pd.concat([df, class_row], axis=1)
 
-data_rain_drop
 
