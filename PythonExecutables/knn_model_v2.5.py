@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
 import csvreadwritetemplate as csv
 
 ### change if u want
@@ -22,10 +23,16 @@ def rain_data_group(data):
 def classify_rainfall(rain_data):
     classify_row = pd.DataFrame(columns=["RAINCLASS"])
     for i in range(len(rain_data)):
-        if rain_data[i] <= 0:
+        if 0<=rain_data[i] < 7.47:
             classify_row.loc[i] = 0
-        else:
+        elif 7.47 <=rain_data[i] < 8.02:
             classify_row.loc[i] = 1
+        elif 8.02<=rain_data[i] < 26.7:
+            classify_row.loc[i] = 2
+        else:
+            classify_row.loc[i] = 3
+            
+
     return classify_row
 
 def split_col(data,d_cut,col_len):
@@ -67,14 +74,10 @@ plt.xlabel("Rainfall Amount")
 plt.ylabel("Frequency")
 plt.show()
 
-# Data Transformation Visualization
-plt.figure(figsize=(12,6))
-plt.plot(range(len(df["RAINFALL"])), df["RAINFALL"], label="Original Rainfall Data")
-plt.xlabel("Time")
-plt.ylabel("Rainfall")
-plt.title("Rainfall Data Transformation Over Time")
-plt.legend()
-plt.show()
+# Rainfall Statistics
+rainfall_stats = df['RAINFALL'].describe(percentiles=[0.25, 0.5, 0.75])
+print("\nRainfall Statistics:")
+print(rainfall_stats)
 
 # Data Preparation
 X_train, X_test, y_train, y_test = train_test_split(data, vals, test_size=TEST, random_state=4)
@@ -103,18 +106,10 @@ y_pred_class = pd.DataFrame(y_pred_class)
 y_test_class = y_test_class.reset_index(drop=True)
 y_pred_class = y_pred_class.reset_index(drop=True)
 
-# Model Predictions vs. Actual Values
-plt.figure(figsize=(10,5))
-plt.bar(range(len(y_test_class)), y_test_class, color='blue', alpha=0.5, label='Actual')
-plt.bar(range(len(y_pred_class)), y_pred_class.iloc[:,0], color='red', alpha=0.5, label='Predicted')
-plt.xlabel("Sample Index")
-plt.ylabel("Rainfall Class (0 = No Rain, 1 = Rain)")
-plt.title("Actual vs. Predicted Rainfall Classification")
-plt.legend()
-plt.show()
-
 # Accuracy Calculation
 count = (y_test_class == y_pred_class.iloc[:,0]).sum()
 accuracy = count / len(y_pred_class)
 print(f"Correct Predictions: {count}")
 print(f"K-NN Classification Accuracy: {accuracy:.2f}")
+
+
