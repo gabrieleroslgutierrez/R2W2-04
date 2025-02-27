@@ -15,8 +15,38 @@ PRED_DAYS = 1 # dont change for now
 K = 20
 ### change if u want
 
-def rain_data_group(data):
-    return
+def rain_data_group(data,ydata):
+    data = data.reset_index(drop=True)
+    ydata = ydata.reset_index(drop=True)
+    out_x = pd.DataFrame(columns=data.columns)
+    out_y = pd.DataFrame(columns=ydata.columns)
+    for i in range(len(data)):
+        if ydata.loc[i,f"RAINCLASS{DAYS}"] == 1:
+            x = (pd.DataFrame(data.iloc[i])).T
+            y = (pd.DataFrame(ydata.iloc[i])).T
+            out_x = pd.concat([out_x, x], ignore_index=True)
+            out_y = pd.concat([out_y, y], ignore_index=True)
+
+    print(out_x)
+    out_y = out_y.drop(columns=[f"RAINCLASS{DAYS}"])
+    print(out_y)
+    return out_x, out_y
+
+def no_rain_data_group(data,ydata):
+    data = data.reset_index(drop=True)
+    ydata = ydata.reset_index(drop=True)
+    out_x = pd.DataFrame(columns=data.columns)
+    out_y = pd.DataFrame(columns=ydata.columns)
+    for i in range(len(data)):
+        if ydata.loc[i,f"RAINCLASS{DAYS}"] == 0:
+            x = (pd.DataFrame(data.iloc[i])).T
+            y = (pd.DataFrame(ydata.iloc[i])).T
+            out_x = pd.concat([out_x, x], ignore_index=True)
+            out_y = pd.concat([out_y, y], ignore_index=True)
+    print(out_x)
+    out_y = out_y.drop(columns=[f"RAINCLASS{DAYS}",f"RAINFALL{DAYS}"])
+    print(out_y)
+    return out_x, out_y
 
 def classify_rainfall(rain_data):
     classify_row = pd.DataFrame(columns=["RAINCLASS"])
@@ -55,9 +85,9 @@ input_file = input("Input file location: ")
 df = csv.read_csv_file(input_file)
 
 class_row = classify_rainfall(df["RAINFALL"])
-df = pd.concat([df, class_row], axis=1)
+df_2 = pd.concat([df, class_row], axis=1)
 
-data, vals = transform_data(df,DAYS,PRED_DAYS)
+data, vals = transform_data(df_2,DAYS,PRED_DAYS)
 print(data)
 print(vals)
 
@@ -75,7 +105,6 @@ print(y_test)
 
 data_rain_drop = data.drop(columns=[f"RAINFALL{i}" for i in range(DAYS)])
 print(data_rain_drop)
-vals
 
 X_train_drop = X_train.drop(columns=[f"RAINFALL{i}" for i in range(DAYS)])
 print(X_train_drop)
@@ -100,25 +129,57 @@ print(y_train_class)
 y_test_class = y_test_drop[f"RAINCLASS{DAYS}"]
 print(y_test_class)
 
+X_train_raingroup, y_train_raingroup = rain_data_group(X_train_noclass,y_train)
+X_train_noraingroup, y_train_noraingroup = no_rain_data_group(X_train_noclass,y_train)
 ###
 
 KClass_rain = KNeighborsClassifier(n_neighbors=K)
 KClass_rain.fit(X_train_drop,y_train_class)
 
-y_pred_class = KClass_rain.predict(X_test_drop)
-y_pred_class = pd.DataFrame(y_pred_class)
+KRegressor_raingroup = KNeighborsRegressor(n_neighbors=K)
+KRegressor_raingroup.fit(X_train_raingroup,y_train_raingroup)
 
-y_test_class = y_test_class.reset_index(drop=True)
-print(y_test_class)
-y_pred_class = y_pred_class.reset_index(drop=True)
-print(y_pred_class)
+KRegressor_noraingroup = KNeighborsRegressor(n_neighbors=K)
+KRegressor_noraingroup.fit(X_train_noraingroup,y_train_noraingroup)
 
-count = 0
-for i in range(len(y_test_class)):
-    if y_test_class.iloc[i] == y_pred_class.iloc[i,0] :
-        count = count + 1
-print(count)
-print(count/(len(y_pred_class)))
+predictions = pd.DataFrame(columns=df.columns)
+for i in range(len(X_test_drop)):
+    y_pred_class = KClass_rain.predict((pd.DataFrame(X_test_drop.iloc[i])).T)
+    print(y_pred_class.tolist())
+    if y_pred_class == 0:
+        #print("regression, rain = 0")
+        y_pred = KRegressor_noraingroup.predict((pd.DataFrame(X_test_noclass.iloc[i])).T)
+        new_value = np.array([[0.0]])  # New value to add
+        y_pred = np.insert(y_pred, 0, new_value, axis=1) 
+        pred = pd.DataFrame(y_pred,columns=df.columns)
+        predictions = pd.concat([predictions, pred], axis=0, ignore_index=True)
+        print(pred)
+    else:
+        if y_pred_class == 1:
+            #print("regression with rain")
+            y_pred = KRegressor_raingroup.predict((pd.DataFrame(X_test_noclass.iloc[i])).T)
+            pred = pd.DataFrame(y_pred,columns=df.columns)
+            predictions = pd.concat([predictions, pred], axis=0, ignore_index=True)
+            print(pred)
 
+print(predictions)
+y_test_noclass = y_test_noclass.rename(columns={f"RAINFALL{DAYS}": "RAINFALL",f"TMAX{DAYS}": "TMAX",f"TMIN{DAYS}": "TMIN",f"RH{DAYS}": "RH",f"WIND_SPEED{DAYS}": "WIND_SPEED",f"WIND_DIRECTION{DAYS}": "WIND_DIRECTION",f"BAROMETRIC_AIR_PRESSURE{DAYS}": "BAROMETRIC_AIR_PRESSURE"})
+print(y_test_noclass)
 
+y_abs_diff = (y_test_noclass.subtract(predictions)).abs()
+
+print(y_abs_diff)
+
+MAE_list = []
+for i in range(len(y_abs_diff.columns)):
+    MAE_col = ((y_abs_diff.iloc[:,i]).sum())/(len(y_abs_diff))
+    MAE_col = MAE_col.tolist()
+    MAE_list.append(MAE_col)
+
+print(MAE_list)
+print("\n")
+
+for i in range(len(MAE_list)):
+    MAPE = MAE_list[i]/(predictions.iloc[:,i].sum()/len(predictions))
+    print(MAPE)
 
