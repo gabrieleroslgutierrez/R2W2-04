@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
 import csvreadwritetemplate as csv
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 #change if u want
 TEST = 0.2
@@ -94,8 +95,19 @@ y_pred_arr = knn_classifier.predict(x_test)
 col_names = ["Predictions"]
 y_pred = pd.DataFrame(y_pred_arr, columns=col_names)
 
-print("y-pred, y-test")
+print("y-pred")
 print(y_pred)
+print("y-test")
 print(y_test)
 print("-----------------------------------------------")
 
+#metrics stuff
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+
+print("Accuracy: ", accuracy)
+print("Precision: ", precision)
+print("Recall: ", recall)
+print("F1 score: ", f1)
