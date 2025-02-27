@@ -5,10 +5,10 @@ from sklearn.neighbors import KNeighborsRegressor
 import csvreadwritetemplate as csv
 
 #change if u want
-TEST = 0.2
-DAYS = 7
+TEST = 0.3
+DAYS = 14
 PRED_DAYS = 1
-K = 20
+K = 10
 #train-test split with respect to the consecutive days
 #didin't use scikit's built-it because we need to preserve consec days
 
@@ -93,7 +93,3 @@ for i in range(len(y_abs_diff.columns)):
 
 print(MAE_list)
 print("\n")
-
-for i in range(len(MAE_list)):
-    MAPE = MAE_list[i]/(y_pred.iloc[:,i].sum()/len(y_pred))
-    print(MAPE)

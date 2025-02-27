@@ -9,10 +9,10 @@ from sklearn.model_selection import train_test_split
 import csvreadwritetemplate as csv
 
 ### change if u want
-TEST = 0.2
-DAYS = 7
+TEST = 0.25
+DAYS = 45
 PRED_DAYS = 1 # dont change for now
-K = 20
+K = 50
 ### change if u want
 
 def rain_data_group(data,ydata):
@@ -164,7 +164,11 @@ for i in range(len(X_test_drop)):
 
 print(predictions)
 y_test_noclass = y_test_noclass.rename(columns={f"RAINFALL{DAYS}": "RAINFALL",f"TMAX{DAYS}": "TMAX",f"TMIN{DAYS}": "TMIN",f"RH{DAYS}": "RH",f"WIND_SPEED{DAYS}": "WIND_SPEED",f"WIND_DIRECTION{DAYS}": "WIND_DIRECTION",f"BAROMETRIC_AIR_PRESSURE{DAYS}": "BAROMETRIC_AIR_PRESSURE"})
+y_test_noclass = y_test_noclass.reset_index(drop=True)
 print(y_test_noclass)
+
+predictions.to_csv("1.csv", index=False)
+y_test_noclass.to_csv("2.csv", index=False)
 
 y_abs_diff = (y_test_noclass.subtract(predictions)).abs()
 
