@@ -15,9 +15,9 @@ from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_ma
 
 ### change if u want
 TEST = 0.25
-DAYS = 14
+DAYS = 21
 PRED_DAYS = 1 # dont change for now
-K = 5
+K = 10
 ### change if u want
 
 # Groups data where rain occurred
@@ -169,12 +169,14 @@ print(predictions)
 print(y_test_noclass)
 
 MAE_list = []
+AVERAGES_list = []
+
 MAPE_list = []
+
 for i in range(len(predictions.columns)):
     print("---")
     ave_abs_diff = 0
     average = 0
-    aver = 0
     count = 0
     if predictions.iloc[:,i].name == "RAINFALL":
         for j in range(len(predictions)):
@@ -185,7 +187,6 @@ for i in range(len(predictions.columns)):
                 print(y_test_noclass.iloc[j,i])
                 average = average + y_test_noclass.iloc[j,i]
                 ave_abs_diff = ave_abs_diff + abs(predictions.iloc[j,i] - y_test_noclass.iloc[j,i])
-                aver = aver + (abs(predictions.iloc[j,i] - y_test_noclass.iloc[j,i]))/(y_test_noclass.iloc[j,i])
                 count = count + 1
     else: 
         for j in range(len(predictions)):
@@ -195,9 +196,15 @@ for i in range(len(predictions.columns)):
             ave_abs_diff = ave_abs_diff + abs(predictions.iloc[j,i] - y_test_noclass.iloc[j,i])
             count = count + 1
     MAE_list.append((ave_abs_diff/count).tolist())
+    AVERAGES_list.append(((average/count).tolist()))
     MAPE_list.append(((ave_abs_diff/count)/(average/count)).tolist())
 
+print("\n---------\n")
+print("Mean Absolute Error:")
 print(MAE_list)
+print("Average Value:")
+print(AVERAGES_list)
+print("Mean Absolute Percantage Error (MAE/AVE):")
 print(MAPE_list)
 
 
