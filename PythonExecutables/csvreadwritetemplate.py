@@ -9,6 +9,7 @@ def read_csv_file(file_path):
         return data
     except Exception as e:
         print(f"Error Reading CSV File: {e}")
+        raise Exception("Invalid FILE")
         return None
 
 # Writing to a CSV File

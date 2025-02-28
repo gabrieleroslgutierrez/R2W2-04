@@ -4,6 +4,7 @@ KNN V2
 from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
+import sys
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
@@ -16,8 +17,8 @@ from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_ma
 ### change if u want
 TEST = 0.25
 DAYS = 21
-PRED_DAYS = 1 # dont change for now
 K = 10
+PRED_DAYS = 1 # dont change for now
 ### change if u want
 
 # Groups data where rain occurred
@@ -90,9 +91,22 @@ def transform_data(train_data,days,d_cut):
     t,r = split_col(transform_train_data,d_cut,len(train_data.columns))
     return t,r
 
-#get file
-input_file = input("Input file location: ")
-df = csv.read_csv_file(input_file)
+#get file and params
+try:
+    input_file = input("Input file location: ")
+    df = csv.read_csv_file(input_file)
+
+    DAYS = int(input("Input number of days: "))
+    if isinstance(DAYS, int) == False or DAYS <= 0:
+        raise Exception("Invalid DAYS")
+
+    K = int(input("Input K neighbors: "))
+    if isinstance(K, int) == False or K <= 0:
+        raise Exception("Invalid K")
+
+except Exception as e:
+    print(f"An error occurred: {e}")
+    sys.exit()
 
 class_row = classify_rainfall(df["RAINFALL"])
 df_2 = pd.concat([df, class_row], axis=1)
