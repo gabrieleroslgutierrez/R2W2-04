@@ -1,12 +1,15 @@
 '''
 KNN V2
 '''
+from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
+from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import csvreadwritetemplate as csv
+import seaborn as sns
 
 ### change if u want
 TEST = 0.25
@@ -141,6 +144,9 @@ X_train_noraingroup, y_train_noraingroup = no_rain_data_group(X_train_noclass,y_
 KClass_rain = KNeighborsClassifier(n_neighbors=K)
 KClass_rain.fit(X_train_drop,y_train_class)
 
+y_pred_class_test = KClass_rain.predict(X_test_drop)
+
+
 KRegressor_raingroup = KNeighborsRegressor(n_neighbors=K)
 KRegressor_raingroup.fit(X_train_raingroup,y_train_raingroup)
 
@@ -188,3 +194,14 @@ print("\n")
 for i in range(len(MAE_list)):
     MAPE = MAE_list[i]/(predictions.iloc[:,i].sum()/len(predictions))
     print(MAPE)
+
+# Compute confusion matrix
+conf_matrix = confusion_matrix(y_test_class, y_pred_class_test)
+
+# Plot confusion matrix
+plt.figure(figsize=(6, 4))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=["No Rain", "Rain"], yticklabels=["No Rain", "Rain"])
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix for Rainfall Classification")
+plt.show()
