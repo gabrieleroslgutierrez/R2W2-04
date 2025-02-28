@@ -184,7 +184,6 @@ print(y_test_noclass)
 
 MAE_list = []
 AVERAGES_list = []
-
 MAPE_list = []
 
 for i in range(len(predictions.columns)):
@@ -215,10 +214,29 @@ for i in range(len(predictions.columns)):
 
 print("\n---------\n")
 print("Mean Absolute Error:")
+model_MAE = 0
+for i in range(len(MAE_list)):
+    model_MAE = model_MAE + MAE_list[i]
+model_MAE = model_MAE/len(MAE_list)
+print(model_MAE)
 print(MAE_list)
+
 print("Average Value:")
+model_AVERAGES = 0
+for i in range(len(AVERAGES_list)):
+    model_AVERAGES = model_AVERAGES + AVERAGES_list[i]
+model_AVERAGES = model_AVERAGES/len(AVERAGES_list)
+print(model_AVERAGES)
 print(AVERAGES_list)
+
+
 print("Mean Absolute Percantage Error (MAE/AVE):")
+model_MAPE = 0
+for i in range(len(MAPE_list)):
+    model_MAPE = model_MAPE + MAPE_list[i]
+model_MAPE = model_MAPE/len(MAPE_list)
+print(model_MAPE)
+print(MAPE_list)
 print(MAPE_list)
 
 
