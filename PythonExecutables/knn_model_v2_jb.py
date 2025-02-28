@@ -10,11 +10,12 @@ import csvreadwritetemplate as csv
 
 ### change if u want
 TEST = 0.2
-DAYS = 7
+DAYS = 14 #Optimal days is 10/14 for the data set for some reason
 PRED_DAYS = 1 # dont change for now
 K = 20
 ### change if u want
 
+# Groups data where rain occurred
 def rain_data_group(data,ydata):
     data = data.reset_index(drop=True)
     ydata = ydata.reset_index(drop=True)
@@ -32,6 +33,7 @@ def rain_data_group(data,ydata):
     print(out_y)
     return out_x, out_y
 
+# Groups data where no rain occurred
 def no_rain_data_group(data,ydata):
     data = data.reset_index(drop=True)
     ydata = ydata.reset_index(drop=True)
@@ -48,6 +50,7 @@ def no_rain_data_group(data,ydata):
     print(out_y)
     return out_x, out_y
 
+# Classifies rainfall into binary classes (0 or 1)
 def classify_rainfall(rain_data):
     classify_row = pd.DataFrame(columns=["RAINCLASS"])
     for i in range(len(rain_data)):
@@ -58,12 +61,14 @@ def classify_rainfall(rain_data):
     print(classify_row)
     return classify_row
 
+# Splits data into training and result sets
 def split_col(data,d_cut,col_len):
     cut_index = (len(data.columns)) - (d_cut*col_len)
     new_train = data.iloc[:,:cut_index]
     result = data.iloc[:,cut_index:]
     return new_train, result
 
+# Transforms data for training
 def transform_data(train_data,days,d_cut):
     transform_train_data = pd.DataFrame()
     for i in range(len(train_data) - days):
@@ -166,6 +171,8 @@ print(predictions)
 y_test_noclass = y_test_noclass.rename(columns={f"RAINFALL{DAYS}": "RAINFALL",f"TMAX{DAYS}": "TMAX",f"TMIN{DAYS}": "TMIN",f"RH{DAYS}": "RH",f"WIND_SPEED{DAYS}": "WIND_SPEED",f"WIND_DIRECTION{DAYS}": "WIND_DIRECTION",f"BAROMETRIC_AIR_PRESSURE{DAYS}": "BAROMETRIC_AIR_PRESSURE"})
 print(y_test_noclass)
 
+y_test_noclass.to_csv("predictions.csv", index=False)
+
 y_abs_diff = (y_test_noclass.subtract(predictions)).abs()
 
 print(y_abs_diff)
@@ -182,4 +189,3 @@ print("\n")
 for i in range(len(MAE_list)):
     MAPE = MAE_list[i]/(predictions.iloc[:,i].sum()/len(predictions))
     print(MAPE)
-

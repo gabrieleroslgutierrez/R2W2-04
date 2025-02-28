@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import f1_score, precision_score, recall_score
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
@@ -24,18 +23,14 @@ def rain_data_group(data):
 def classify_rainfall(rain_data):
     classify_row = pd.DataFrame(columns=["RAINCLASS"])
     for i in range(len(rain_data)):
-        if 0<=rain_data[i] < 8.025: # 0th - 75th percentile
+        if 0<=rain_data[i] < 7.47:
             classify_row.loc[i] = 0
-        elif 8.025 <=rain_data[i] < 12.3: #  75th - 80th percentile
+        elif 7.47 <=rain_data[i] < 8.02:
             classify_row.loc[i] = 1
-        elif 12.3 <=rain_data[i] < 17.3: #  80th - 85th percentile
+        elif 8.02<=rain_data[i] < 26.7:
             classify_row.loc[i] = 2
-        elif 17.3 <=rain_data[i] < 26.4: #  85th - 90th percentile
-            classify_row.loc[i] = 3
-        elif 26.48 <=rain_data[i] < 44.2: #  90th - 95th percentile
-            classify_row.loc[i] = 4
         else:
-            classify_row.loc[i] = 5
+            classify_row.loc[i] = 3
             
 
     return classify_row
@@ -71,18 +66,6 @@ df = pd.concat([df, class_row], axis=1)
 
 data, vals = transform_data(df,DAYS,PRED_DAYS)
 
-# Feature Distribution Plot
-plt.figure(figsize=(10,5))
-sns.histplot(df['RAINFALL'], bins=30, kde=True)
-plt.title("Rainfall Data Distribution")
-plt.xlabel("Rainfall Amount")
-plt.ylabel("Frequency")
-plt.show()
-
-# Rainfall Statistics
-rainfall_stats = df['RAINFALL'].describe(percentiles=[0.25, 0.5, 0.75])
-print("\nRainfall Statistics:")
-print(rainfall_stats)
 
 # Data Preparation
 X_train, X_test, y_train, y_test = train_test_split(data, vals, test_size=TEST, random_state=4)
@@ -116,6 +99,5 @@ count = (y_test_class == y_pred_class.iloc[:,0]).sum()
 accuracy = count / len(y_pred_class)
 print(f"Correct Predictions: {count}")
 print(f"K-NN Classification Accuracy: {accuracy:.2f}")
-
 
 
