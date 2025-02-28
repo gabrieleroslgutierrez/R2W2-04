@@ -7,6 +7,8 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import csvreadwritetemplate as csv
+from matplotlib import pyplot as plt
+from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix, precision_score, recall_score, f1_score
 
 ### change if u want
 TEST = 0.25
@@ -171,6 +173,10 @@ print(predictions)
 y_test_noclass = y_test_noclass.rename(columns={f"RAINFALL{DAYS}": "RAINFALL",f"TMAX{DAYS}": "TMAX",f"TMIN{DAYS}": "TMIN",f"RH{DAYS}": "RH",f"WIND_SPEED{DAYS}": "WIND_SPEED",f"WIND_DIRECTION{DAYS}": "WIND_DIRECTION",f"BAROMETRIC_AIR_PRESSURE{DAYS}": "BAROMETRIC_AIR_PRESSURE"})
 y_test_noclass = y_test_noclass.reset_index(drop=True)
 print(y_test_noclass)
+
+
+#TESTS HERE
+
 
 y_abs_diff = (y_test_noclass.subtract(predictions)).abs()
 
