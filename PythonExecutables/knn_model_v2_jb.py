@@ -13,9 +13,9 @@ import seaborn as sns
 
 ### change if u want
 TEST = 0.25
-DAYS = 45
+DAYS = 14
 PRED_DAYS = 1 # dont change for now
-K = 50
+K = 5
 ### change if u want
 
 # Groups data where rain occurred
