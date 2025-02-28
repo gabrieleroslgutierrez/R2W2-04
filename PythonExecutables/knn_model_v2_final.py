@@ -194,11 +194,6 @@ for i in range(len(predictions.columns)):
             average = average + y_test_noclass.iloc[j,i]
             ave_abs_diff = ave_abs_diff + abs(predictions.iloc[j,i] - y_test_noclass.iloc[j,i])
             count = count + 1
-    print("---")
-    print(count)
-    print((average/count))
-    print((ave_abs_diff/count))
-    print("---")
     MAE_list.append((ave_abs_diff/count).tolist())
     MAPE_list.append(((ave_abs_diff/count)/(average/count)).tolist())
 
