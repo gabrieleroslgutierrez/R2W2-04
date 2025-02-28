@@ -146,11 +146,10 @@ KClass_rain.fit(X_train_drop,y_train_class)
 
 y_pred_class_test = KClass_rain.predict(X_test_drop)
 
-
-KRegressor_raingroup = KNeighborsRegressor(n_neighbors=K)
+KRegressor_raingroup = KNeighborsRegressor(n_neighbors=K,weights="distance")
 KRegressor_raingroup.fit(X_train_raingroup,y_train_raingroup)
 
-KRegressor_noraingroup = KNeighborsRegressor(n_neighbors=K)
+KRegressor_noraingroup = KNeighborsRegressor(n_neighbors=K,weights="distance")
 KRegressor_noraingroup.fit(X_train_noraingroup,y_train_noraingroup)
 
 predictions = pd.DataFrame(columns=df.columns)
