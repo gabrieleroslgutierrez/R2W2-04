@@ -1,20 +1,23 @@
 '''
 KNN V2
 '''
+from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
+from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import csvreadwritetemplate as csv
+import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix, precision_score, recall_score, f1_score
 
 ### change if u want
 TEST = 0.25
-DAYS = 45
+DAYS = 14
 PRED_DAYS = 1 # dont change for now
-K = 50
+K = 5
 ### change if u want
 
 # Groups data where rain occurred
@@ -95,46 +98,30 @@ class_row = classify_rainfall(df["RAINFALL"])
 df_2 = pd.concat([df, class_row], axis=1)
 
 data, vals = transform_data(df_2,DAYS,PRED_DAYS)
-print(data)
-print(vals)
 
 #data stuff
 X_train, X_test, y_train, y_test = train_test_split(data, vals, test_size=TEST, random_state=4)
 
 X_train = pd.DataFrame(X_train)
-print(X_train)
 y_train = pd.DataFrame(y_train)
-print(y_train)
 X_test = pd.DataFrame(X_test)
-print(X_test)
 y_test = pd.DataFrame(y_test)
-print(y_test)
 
 data_rain_drop = data.drop(columns=[f"RAINFALL{i}" for i in range(DAYS)])
-print(data_rain_drop)
 
 X_train_drop = X_train.drop(columns=[f"RAINFALL{i}" for i in range(DAYS)])
-print(X_train_drop)
 y_train_drop = y_train.drop(columns=[f"RAINFALL{i}" for i in range(DAYS,DAYS+PRED_DAYS)])
-print(y_train_drop)
 X_test_drop = X_test.drop(columns=[f"RAINFALL{i}" for i in range(DAYS)])
-print(X_test_drop)
 y_test_drop = y_test.drop(columns=[f"RAINFALL{i}" for i in range(DAYS,DAYS+PRED_DAYS)])
-print(y_test_drop)
 
 X_train_noclass = X_train.drop(columns=[f"RAINCLASS{i}" for i in range(DAYS)])
-print(X_train_noclass)
 y_train_noclass = y_train.drop(columns=[f"RAINCLASS{i}" for i in range(DAYS,DAYS+PRED_DAYS)])
-print(y_train_noclass)
 X_test_noclass = X_test.drop(columns=[f"RAINCLASS{i}" for i in range(DAYS)])
-print(X_test_noclass)
 y_test_noclass = y_test.drop(columns=[f"RAINCLASS{i}" for i in range(DAYS,DAYS+PRED_DAYS)])
-print(y_test_noclass)
 
 y_train_class = y_train_drop[f"RAINCLASS{DAYS}"]
-print(y_train_class)
 y_test_class = y_test_drop[f"RAINCLASS{DAYS}"]
-print(y_test_class)
+
 
 X_train_raingroup, y_train_raingroup = rain_data_group(X_train_noclass,y_train)
 X_train_noraingroup, y_train_noraingroup = no_rain_data_group(X_train_noclass,y_train)
@@ -142,6 +129,9 @@ X_train_noraingroup, y_train_noraingroup = no_rain_data_group(X_train_noclass,y_
 
 KClass_rain = KNeighborsClassifier(n_neighbors=K)
 KClass_rain.fit(X_train_drop,y_train_class)
+
+y_pred_class_test = KClass_rain.predict(X_test_drop)
+
 
 KRegressor_raingroup = KNeighborsRegressor(n_neighbors=K)
 KRegressor_raingroup.fit(X_train_raingroup,y_train_raingroup)
@@ -152,7 +142,6 @@ KRegressor_noraingroup.fit(X_train_noraingroup,y_train_noraingroup)
 predictions = pd.DataFrame(columns=df.columns)
 for i in range(len(X_test_drop)):
     y_pred_class = KClass_rain.predict((pd.DataFrame(X_test_drop.iloc[i])).T)
-    print(y_pred_class.tolist())
     if y_pred_class == 0:
         #print("regression, rain = 0")
         y_pred = KRegressor_noraingroup.predict((pd.DataFrame(X_test_noclass.iloc[i])).T)
@@ -160,21 +149,71 @@ for i in range(len(X_test_drop)):
         y_pred = np.insert(y_pred, 0, new_value, axis=1) 
         pred = pd.DataFrame(y_pred,columns=df.columns)
         predictions = pd.concat([predictions, pred], axis=0, ignore_index=True)
-        print(pred)
     else:
         if y_pred_class == 1:
             #print("regression with rain")
             y_pred = KRegressor_raingroup.predict((pd.DataFrame(X_test_noclass.iloc[i])).T)
             pred = pd.DataFrame(y_pred,columns=df.columns)
             predictions = pd.concat([predictions, pred], axis=0, ignore_index=True)
-            print(pred)
 
-print(predictions)
 y_test_noclass = y_test_noclass.rename(columns={f"RAINFALL{DAYS}": "RAINFALL",f"TMAX{DAYS}": "TMAX",f"TMIN{DAYS}": "TMIN",f"RH{DAYS}": "RH",f"WIND_SPEED{DAYS}": "WIND_SPEED",f"WIND_DIRECTION{DAYS}": "WIND_DIRECTION",f"BAROMETRIC_AIR_PRESSURE{DAYS}": "BAROMETRIC_AIR_PRESSURE"})
 y_test_noclass = y_test_noclass.reset_index(drop=True)
-print(y_test_noclass)
 
 
 #TESTS HERE
 
+print("\n---------\n")
+
+#Computation of MAE
+print(predictions)
+print(y_test_noclass)
+
+MAE_list = []
+MAPE_list = []
+for i in range(len(predictions.columns)):
+    print("---")
+    ave_abs_diff = 0
+    average = 0
+    aver = 0
+    count = 0
+    if predictions.iloc[:,i].name == "RAINFALL":
+        for j in range(len(predictions)):
+            print(predictions.iloc[j,i])
+            print(y_test_noclass.iloc[j,i])
+            if predictions.iloc[j,i] > 0 and y_test_noclass.iloc[j,i] > 0:
+                print(predictions.iloc[j,i])
+                print(y_test_noclass.iloc[j,i])
+                average = average + y_test_noclass.iloc[j,i]
+                ave_abs_diff = ave_abs_diff + abs(predictions.iloc[j,i] - y_test_noclass.iloc[j,i])
+                aver = aver + (abs(predictions.iloc[j,i] - y_test_noclass.iloc[j,i]))/(y_test_noclass.iloc[j,i])
+                count = count + 1
+    else: 
+        for j in range(len(predictions)):
+            print(predictions.iloc[j,i])
+            print(y_test_noclass.iloc[j,i])
+            average = average + y_test_noclass.iloc[j,i]
+            ave_abs_diff = ave_abs_diff + abs(predictions.iloc[j,i] - y_test_noclass.iloc[j,i])
+            count = count + 1
+    print("---")
+    print(count)
+    print((average/count))
+    print((ave_abs_diff/count))
+    print("---")
+    MAE_list.append((ave_abs_diff/count).tolist())
+    MAPE_list.append(((ave_abs_diff/count)/(average/count)).tolist())
+
+print(MAE_list)
+print(MAPE_list)
+
+
+#Rainfall Classification Test
+# Compute confusion matrix
+conf_matrix = confusion_matrix(y_test_class, y_pred_class_test)
+# Plot confusion matrix
+plt.figure(figsize=(6, 4))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=["No Rain", "Rain"], yticklabels=["No Rain", "Rain"])
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix for Rainfall Classification")
+plt.show()
 
