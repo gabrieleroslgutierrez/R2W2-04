@@ -1,23 +1,20 @@
 '''
 KNN V2
 '''
-from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
-from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import csvreadwritetemplate as csv
-import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix, precision_score, recall_score, f1_score
 
 ### change if u want
 TEST = 0.25
-DAYS = 14
+DAYS = 45
 PRED_DAYS = 1 # dont change for now
-K = 5
+K = 50
 ### change if u want
 
 # Groups data where rain occurred
@@ -146,9 +143,6 @@ X_train_noraingroup, y_train_noraingroup = no_rain_data_group(X_train_noclass,y_
 KClass_rain = KNeighborsClassifier(n_neighbors=K)
 KClass_rain.fit(X_train_drop,y_train_class)
 
-y_pred_class_test = KClass_rain.predict(X_test_drop)
-
-
 KRegressor_raingroup = KNeighborsRegressor(n_neighbors=K)
 KRegressor_raingroup.fit(X_train_raingroup,y_train_raingroup)
 
@@ -184,30 +178,3 @@ print(y_test_noclass)
 #TESTS HERE
 
 
-y_abs_diff = (y_test_noclass.subtract(predictions)).abs()
-
-print(y_abs_diff)
-
-MAE_list = []
-for i in range(len(y_abs_diff.columns)):
-    MAE_col = ((y_abs_diff.iloc[:,i]).sum())/(len(y_abs_diff))
-    MAE_col = MAE_col.tolist()
-    MAE_list.append(MAE_col)
-
-print(MAE_list)
-print("\n")
-
-for i in range(len(MAE_list)):
-    MAPE = MAE_list[i]/(predictions.iloc[:,i].sum()/len(predictions))
-    print(MAPE)
-
-# Compute confusion matrix
-conf_matrix = confusion_matrix(y_test_class, y_pred_class_test)
-
-# Plot confusion matrix
-plt.figure(figsize=(6, 4))
-sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=["No Rain", "Rain"], yticklabels=["No Rain", "Rain"])
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
-plt.title("Confusion Matrix for Rainfall Classification")
-plt.show()
